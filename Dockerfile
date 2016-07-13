@@ -1,4 +1,4 @@
-FROM nvidia/cuda:7.5-cudnn4-devel
+FROM nvidia/cuda:7.5-cudnn5-devel
 MAINTAINER Edgar Y. Walker <edgar.walker@gmail.com>
 
 # Install dependencies
@@ -30,6 +30,8 @@ ENV LUA_CPATH='/root/torch/install/lib/?.so;'$LUA_CPATH
 # Install torch CUDA extension
 RUN luarocks install cutorch && \
     luarocks install cunn
+
+RUN luarocks install itorch
                                                    
 # Setup iTorch notebook by default
-CMD ["/bin/bash", "-c", "itorch notebook"]
+CMD ["/bin/bash"]
