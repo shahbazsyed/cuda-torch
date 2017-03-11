@@ -2,6 +2,8 @@ FROM nvidia/cuda:8.0-cudnn5-devel
 
 # Install dependencies
 RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
+RUN apt-get update && apt-get install -y libqtcore4 libqtgui4
 RUN apt-get update \
     && apt-get install -y curl libzmq3-dev libssl-dev\
        python-zmq ipython-notebook \
