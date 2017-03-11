@@ -1,40 +1,44 @@
 FROM nvidia/cuda:8.0-cudnn5-devel
+MAINTAINER Kai Arulkumaran <design@kaixhin.com>
 
-# Install dependencies
-RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
-RUN apt-get update && apt-get install -y libqtcore4 libqtgui4
-RUN apt-get update \
-    && apt-get install -y curl libzmq3-dev libssl-dev\
-       python-zmq ipython-notebook \
-       git cmake software-properties-common \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Install git, apt-add-repository and dependencies for iTorch
+RUN apt-get update && apt-get install -y \
+  git \
+  software-properties-common \
+  ipython3 \
+  libssl-dev \
+  libzmq3-dev \
+  python-zmq \
+  python-pip
 
-# Install Torch
-RUN curl -s https://raw.githubusercontent.com/torch/ezinstall/master/install-deps | /bin/bash \
-    && git clone https://github.com/torch/distro.git ~/torch --recursive \
-    && cd ~/torch \
-    && /bin/bash ./install.sh
+# Install Jupyter Notebook for iTorch
+RUN pip install notebook ipywidgets
 
-# Configure iTorch notebook
-ADD ipython_notebook_config.py /root/.ipython/profile_torch/ipython_notebook_config.py
-EXPOSE 8888
-VOLUME /notebooks
-WORKDIR /notebooks
+# Run Torch7 installation scripts (dependencies only)
+RUN git clone https://github.com/torch/distro.git /root/torch --recursive && cd /root/torch && \
+  bash install-deps
+  
+# Run Torch7 installation scripts
+RUN cd /root/torch && \
+  sed -i 's/path_to_nvcc=$(which nvcc)/path_to_nvcc=$(which no_nvcc)/g' install.sh && \
+  sed -i 's,path_to_nvcc=/usr/local/cuda/bin/nvcc,path_to_nvcc=,g' install.sh && \
+  ./install.sh
 
-# Setup environment variables to access installed softwares
-ENV LUA_PATH='/root/.luarocks/share/lua/5.3.4/?.lua;/root/.luarocks/share/lua/5.3.4/?/init.lua;/root/torch/install/share/lua/5.3.4/?.lua;/root/torch/install/share/lua/5.3.4/?/init.lua;./?.lua;/root/torch/install/share/luajit-2.1.0-beta2/?.lua;/usr/local/share/lua/5.3.4/?.lua;/usr/local/share/lua/5.3.4/?/init.lua' 
+# Export environment variables manually
+ENV LUA_PATH='/root/.luarocks/share/lua/5.3.4/?.lua;/root/.luarocks/share/lua/5.3.4/?/init.lua;/root/torch/install/share/lua/5.3.4/?.lua;/root/torch/install/share/lua/5.3.4/?/init.lua;./?.lua;/root/torch/install/share/luajit-2.1.0-beta2/?.lua;/usr/local/share/lua/5.3.4/?.lua;/usr/local/share/lua/5.3.4/?/init.lua'
 ENV LUA_CPATH='/root/.luarocks/lib/lua/5.3.4/?.so;/root/torch/install/lib/lua/5.3.4/?.so;./?.so;/usr/local/lib/lua/5.3.4/?.so;/usr/local/lib/lua/5.3.4/loadall.so'
 ENV PATH=/root/torch/install/bin:$PATH
 ENV LD_LIBRARY_PATH=/root/torch/install/lib:$LD_LIBRARY_PATH
 ENV DYLD_LIBRARY_PATH=/root/torch/install/lib:$DYLD_LIBRARY_PATH
 ENV LUA_CPATH='/root/torch/install/lib/?.so;'$LUA_CPATH
 
-# Install torch CUDA extension
-RUN luarocks install cutorch && \
-    luarocks install cunn
+# Set ~/torch as working directory
+WORKDIR /root/torch
 
-RUN luarocks install itorch
-                                                   
-# Setup iTorch notebook by default
-CMD ["/bin/bash"]
+# Restore Torch7 installation script
+RUN sed -i 's/path_to_nvcc=$(which no_nvcc)/path_to_nvcc=$(which nvcc)/g' install.sh
+
+# Install CUDA libraries
+RUN luarocks install cutorch && \
+  luarocks install cunn && \
+  luarocks install cudnn
