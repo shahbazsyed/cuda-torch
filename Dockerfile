@@ -8,7 +8,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Torch
-RUN curl -s https://raw.githubusercontent.com/torch/ezinstall/master/install-deps | bash \
+RUN curl -s https://raw.githubusercontent.com/torch/ezinstall/master/install-deps | /bin/bash \
     && git clone https://github.com/torch/distro.git ~/torch --recursive \
     && cd ~/torch \
     && /bin/bash ./install.sh
