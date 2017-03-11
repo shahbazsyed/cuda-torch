@@ -10,7 +10,8 @@ RUN apt-get update \
 # Install Torch
 RUN curl -s https://raw.githubusercontent.com/torch/ezinstall/master/install-deps | bash \
     && git clone https://github.com/torch/distro.git ~/torch --recursive \
-    && cd ~/torch; ./install.sh
+    && cd ~/torch
+    && /bin/bash ./install.sh
 
 # Configure iTorch notebook
 ADD ipython_notebook_config.py /root/.ipython/profile_torch/ipython_notebook_config.py
