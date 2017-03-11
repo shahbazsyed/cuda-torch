@@ -1,5 +1,4 @@
 FROM nvidia/cuda:8.0-cudnn5-devel
-MAINTAINER Edgar Y. Walker <edgar.walker@gmail.com>
 
 # Install dependencies
 RUN apt-get update \
@@ -20,8 +19,8 @@ VOLUME /notebooks
 WORKDIR /notebooks
 
 # Setup environment variables to access installed softwares
-ENV LUA_PATH='/root/.luarocks/share/lua/5.1/?.lua;/root/.luarocks/share/lua/5.1/?/init.lua;/root/torch/install/share/lua/5.1/?.lua;/root/torch/install/share/lua/5.1/?/init.lua;./?.lua;/root/torch/install/share/luajit-2.1.0-beta1/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua' 
-ENV LUA_CPATH='/root/.luarocks/lib/lua/5.1/?.so;/root/torch/install/lib/lua/5.1/?.so;./?.so;/usr/local/lib/lua/5.1/?.so;/usr/local/lib/lua/5.1/loadall.so'
+ENV LUA_PATH='/root/.luarocks/share/lua/5.3.4/?.lua;/root/.luarocks/share/lua/5.3.4/?/init.lua;/root/torch/install/share/lua/5.3.4/?.lua;/root/torch/install/share/lua/5.3.4/?/init.lua;./?.lua;/root/torch/install/share/luajit-2.1.0-beta2/?.lua;/usr/local/share/lua/5.3.4/?.lua;/usr/local/share/lua/5.3.4/?/init.lua' 
+ENV LUA_CPATH='/root/.luarocks/lib/lua/5.3.4/?.so;/root/torch/install/lib/lua/5.3.4/?.so;./?.so;/usr/local/lib/lua/5.3.4/?.so;/usr/local/lib/lua/5.3.4/loadall.so'
 ENV PATH=/root/torch/install/bin:$PATH
 ENV LD_LIBRARY_PATH=/root/torch/install/lib:$LD_LIBRARY_PATH
 ENV DYLD_LIBRARY_PATH=/root/torch/install/lib:$DYLD_LIBRARY_PATH
