@@ -2,6 +2,8 @@ FROM nvidia/cuda:8.0-cudnn5-devel
 MAINTAINER Kai Arulkumaran <design@kaixhin.com>
 
 # Install git, apt-add-repository and dependencies for iTorch
+RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN apt-get update && apt-get install -y \
   git \
   software-properties-common \
